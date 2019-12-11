@@ -1,0 +1,7 @@
+#!/bin/bash
+#Authors Amanda Nygårds and Fabian Otterskog
+
+#Create menu
+echo '*******************************'
+echo $'\t' "SYSTEM MANAGER"
+echo '*******************************'
