@@ -3,5 +3,13 @@
 
 #Create menu
 echo '*******************************'
-echo $'\t' "SYSTEM MANAGER"
+echo $'\t' "SYSTEM MANAGER" (BETA)
 echo '*******************************'
+echo ua - User Add $'\t'(Create an new user)
+echo ul - User List $'\t'(List all login users)
+echo uv - User View $'\t'(View user properties)
+echo um - User Modify $'\t'(Modify user properties)
+echo ud - User Delete $'\t'(Delete a login user)
+echo ga - Group Add $'\t' (Create a new group)
+echo gl - Group List $'\t' (List all groups, not system groups)
+echo gv - Group View $'\t' (List all users in a group)
