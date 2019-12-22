@@ -2,14 +2,25 @@
 #Authors Amanda Nygårds and Fabian Otterskog
 
 #Create menu
-echo '*******************************'
-echo $'\t' "SYSTEM MANAGER" (BETA)
-echo '*******************************'
-echo ua - User Add $'\t'(Create an new user)
-echo ul - User List $'\t'(List all login users)
-echo uv - User View $'\t'(View user properties)
-echo um - User Modify $'\t'(Modify user properties)
-echo ud - User Delete $'\t'(Delete a login user)
-echo ga - Group Add $'\t' (Create a new group)
-echo gl - Group List $'\t' (List all groups, not system groups)
-echo gv - Group View $'\t' (List all users in a group)
+printMenu() {
+echo '*********************************************'
+echo $'\t' "SYSTEM MANAGER (BETA)"
+echo '*********************************************'
+echo ua - User Add$'\t'$'\t'"(Create an new user)"
+echo ul - User List$'\t'$'\t'"(List all login users)"
+echo uv - User View$'\t'$'\t'"(View user properties)"
+echo um - User Modify$'\t'"(Modify user properties)"
+echo ud - User Delete$'\t'"(Delete a login user)"
+echo ga - Group Add$'\t'$'\t'"(Create a new group)"
+echo gl - Group List$'\t'$'\t'"(List all groups, not system groups)"
+echo gv - Group View$'\t'$'\t'"(List all users in a group)"
+echo gm - Group Modify$'\t'"(Add/remove user to/from a group)"
+echo gd - Group Delete$'\t'"(Delete a group, not system groups)"
+echo fa - Folder Add$'\t'$'\t'"(Create a new folder)"
+echo fl - Folder List$'\t'$"(View content in a folder)"
+echo fm - Folder Modify$'\t'"(Modify folder properties)"
+echo fd - Folder Delete$'\t'"(Delete a folder)"
+echo ss - SSH Server$'\t'$'\t'"(Manage SSH Server)"
+}
+
+printMenu
