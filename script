@@ -23,4 +23,10 @@ echo fd - Folder Delete$'\t'"(Delete a folder)"
 echo ss - SSH Server$'\t'$'\t'"(Manage SSH Server)"
 }
 
+#Adds a user with useradd shell prompt
+userAdd() {
+read -p 'Username:' usrname
+useradd usrname
+}
+
 printMenu
