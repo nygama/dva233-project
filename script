@@ -36,3 +36,12 @@ echo ----------------------------------------
 echo Current login users on the system:
 awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
 }
+
+#Delete user including home directory
+userDel() {
+echo "WARNING: You are about to delete a user."
+read -p 'User to remove:' usrname
+sudo userdel -r $usrname
+}
+
+printMenu
