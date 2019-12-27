@@ -44,4 +44,27 @@ read -p 'User to remove:' usrname
 sudo userdel -r $usrname
 }
 
+groupMod() {
+echo '*********************************************'
+echo $'\t' "Modify Group"
+echo '*********************************************'
+echo "Do you want to add to a group or remove from a group?"
+read -p '(add/remove):' input
+if ($input != "add" || $input != "remove"); 
+    echo "Error: No valid input for (add/remove)"
+    fi
+echo "Which user to modify?:"
+read -p 'Username' usrname
+echo "Which group to add/remove from?:"
+read -p 'Group name:' grpname
+if ($input == "remove");
+    echo "Removing '$usrname' from group '$grpname'."
+    sudo deluser $usrname $grpname
+
+else
+    echo "Adding '$username' to group '$grpname'."
+    sudo usermod -a -G $grpname $usrname
+fi
+}
+
 printMenu
