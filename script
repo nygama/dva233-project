@@ -1,6 +1,10 @@
 #!/bin/bash
 #Authors Amanda Nygårds and Fabian Otterskog
 
+#GLOBAL VARIABLES
+# The home directory of System Manager.
+SMHOME = pwd
+
 #Create menu
 printMenu() {
 echo '*********************************************'
@@ -65,6 +69,14 @@ else
     echo "Adding '$username' to group '$grpname'."
     sudo usermod -a -G $grpname $usrname
 fi
+}
+
+folderAdd () {
+read -p 'Path:' move
+read -p 'Name of folder:' fname
+mv $move
+mkdir $fname
+mv $SMHOME
 }
 
 printMenu
