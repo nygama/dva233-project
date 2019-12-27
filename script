@@ -79,4 +79,25 @@ mkdir $fname
 mv $SMHOME
 }
 
+
+folderMod() {
+read -p 'Path:' move
+read -p 'Name of folder' fname
+echo "--Options--"
+echo rename $'\t'$'\t' - Rename selected folder.
+echo privilegies $'\t' - Change privilegies for folder. 
+echo stricky bit $'\t' - Change sticky bit.
+echo setgid $'\t'$'\t' - Modify setgid.
+echo lastmod $'\t' - Check and change last modified attribute.
+read -p 'Option:' option
+if $option == "rename";
+    read -p 'New name:' nfname
+    mv $move
+    mv $fname $nfname
+elif $option == "privilegies";
+    read -p 'Set privilegies:' priv
+    
+}
+
+
 printMenu
