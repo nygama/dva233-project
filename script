@@ -30,7 +30,15 @@ echo ss - SSH Server$'\t'$'\t'"(Manage SSH Server)"
 #Adds a user with useradd shell prompt
 userAdd() {
 read -p 'Username:' usrname
-sudo useradd $usrname
+sudo adduser $usrname
+}
+
+userlist() {
+echo '*********************************************'
+echo 'Current logged in users on the system:'
+echo '*********************************************'
+cat /etc/passwd | egrep -o  "^.*:x" | sed s/:x//
+echo '*********************************************'
 }
 
 userView() {
