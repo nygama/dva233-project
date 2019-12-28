@@ -3,7 +3,7 @@
 
 #GLOBAL VARIABLES
 # The home directory of System Manager.
-SMHOME = pwd
+SMHOME=pwd
 
 #Create menu
 printMenu() {
