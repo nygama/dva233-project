@@ -33,6 +33,7 @@ read -p 'Username:' usrname
 sudo adduser $usrname
 }
 
+#Lists all users
 userlist() {
 echo '*********************************************'
 echo 'Current logged in users on the system:'
@@ -47,6 +48,48 @@ userView() {
 echo ----------------------------------------
 echo Current login users on the system:
 awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
+}
+
+#modify a user
+usermod() {
+echo '*********************************************'
+echo $'\t' "Modify User"
+echo '*********************************************'
+echo "Which user to modify?"
+read -p 'User to modify:' usrname
+echo "what do you want to modify? Your oprions are:"
+echo "Nm (Name)"
+echo "Pw (Password)"
+echo "Ud (User ID)"
+echo "Gd (Group ID)"
+echo "Cm (Comment)"
+echo "Hd (Home ditectory)"
+echo "Sh (Shell)"
+read -p 'Option to modify: ' modoption
+read -p 'New value: ' newmod
+if [ $modoption = "Pw" ]
+then
+        usermod -p $newmod $usrname
+elif [ $modoption = "Ud" ]
+then
+        usermod -u $newmod $usrname
+elif [ $modoption = "Gd" ]
+then
+        usermod -g $newmod $usrname
+elif [ $modoption = "Cm" ]
+then
+        usermod -c $newmod $usrname
+elif [ $modoption = "Hd" ]
+then
+        usermod -d $newmod $usrname
+elif [ $modoption = "Sh" ]
+then
+        usermod -s $newmod $usrname
+elif [ $modoption = "Nm" ]
+then
+        usermod -l $newmod $usrname
+fi
+echo "Done"
 }
 
 #Delete user including home directory
