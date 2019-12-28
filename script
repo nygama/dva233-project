@@ -79,7 +79,6 @@ mkdir $fname
 mv $SMHOME
 }
 
-
 folderMod() {
 read -p 'Path:' move
 read -p 'Name of folder' fname
@@ -90,11 +89,11 @@ echo stricky bit $'\t' - Change sticky bit.
 echo setgid $'\t'$'\t' - Modify setgid.
 echo lastmod $'\t' - Check and change last modified attribute.
 read -p 'Option:' option
-if $option == "rename";
+if $option=="rename";
     read -p 'New name:' nfname
     mv $move
     mv $fname $nfname
-elif $option == "privilegies";
+elif $option=="privilegies";
     read -p 'Set privilegies:' priv
     
 }
