@@ -35,9 +35,9 @@ sudo adduser $usrname
 
 userlist() {
 echo '*********************************************'
-echo 'Current logged in users on the system:'
+echo 'Current login users on the system:'
 echo '*********************************************'
-cat /etc/passwd | egrep -o  "^.*:x" | sed s/:x//
+awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
 echo '*********************************************'
 }
 
