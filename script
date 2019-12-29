@@ -105,6 +105,13 @@ read -p 'Name of new group: ' gName
 groupadd $gName
 }
 
+GroupView(){
+echo "whitch group do you want to view?"
+read -p 'groupname: ' gName
+echo "the members of $gName are: "
+cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+}
+
 groupMod() {
 echo '*********************************************'
 echo $'\t' "Modify Group"
