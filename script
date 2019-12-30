@@ -4,6 +4,8 @@
 #GLOBAL VARIABLES
 # The home directory of System Manager.
 SMHOME=pwd
+RED='\033[0;31m'
+NC='\033[0m'
 
 #Create menu
 printMenu() {
@@ -184,5 +186,35 @@ elif $option=="privilegies";
     
 }
 
+sshmod(){
+echo '*********************************************'
+echo $'\t' "Manage SSH Server"
+echo '---------------------------------------------'
+echo -e ${RED}'in' ${NC}- 'install SSH server'
+echo -e ${RED}'rm' ${NC}- 'remove SSH server'
+echo -e ${RED}'on' ${NC}- 'start SSH server'
+echo -e ${RED}'of' ${NC}- 'stop SSH sever'
+echo '---------------------------------------------'
+read -p 'Choice:' option
+echo
+if [ $option = 'in' ]
+then
+apt install openssh-server
+elif [ $option = 'rm' ]
+then
+apt remove openssh-server
+elif [ $option = 'on' ]
+then
+systemctl start ssh
+echo "SSH is activated"
+elif [ $option = 'of' ]
+then
+systemctl stop ssh
+echo "SSH is deactivated"
+else
+echo "Choice was not valid!"
+echo
+fi
+}
 
 printMenu
