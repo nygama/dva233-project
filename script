@@ -135,6 +135,18 @@ else
 fi
 }
 
+#Deletes a non system group
+groupDel(){
+echo "whitch group do you want to delete?"
+read -p 'Name of group:' gName
+if [ cat /etc/group | egrep $gName | awk -F: '{print $3}' > 999 ]
+then
+groupdel $gName
+else
+echo "you can't delete system groups!"
+fi
+}
+
 folderAdd () {
 read -p 'Path:' move
 read -p 'Name of folder:' fname
