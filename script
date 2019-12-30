@@ -155,6 +155,16 @@ mkdir $fname
 mv $SMHOME
 }
 
+folderList(){
+echo "whitch folder do you want list?"
+read -p 'Path to folder:' fPath
+echo
+echo "content of folder: "
+sleep 0.3
+ls -a $fPath
+echo
+}
+
 folderMod() {
 read -p 'Path:' move
 read -p 'Name of folder' fname
