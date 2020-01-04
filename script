@@ -4,6 +4,8 @@
 #GLOBAL VARIABLES
 # The home directory of System Manager.
 SMHOME=pwd
+RED='\033[0;31m'
+NC='\033[0m'
 
 #Create menu
 printMenu() {
@@ -36,9 +38,9 @@ sudo adduser $usrname
 #Lists all users
 userlist() {
 echo '*********************************************'
-echo 'Current logged in users on the system:'
+echo 'Current login users on the system:'
 echo '*********************************************'
-cat /etc/passwd | egrep -o  "^.*:x" | sed s/:x//
+awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
 echo '*********************************************'
 }
 
@@ -99,6 +101,19 @@ read -p 'User to remove:' usrname
 sudo userdel -r $usrname
 }
 
+#add a group
+groupAdd() {
+read -p 'Name of new group: ' gName
+groupadd $gName
+}
+
+GroupView(){
+echo "whitch group do you want to view?"
+read -p 'groupname: ' gName
+echo "the members of $gName are: "
+cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+}
+
 groupMod() {
 echo '*********************************************'
 echo $'\t' "Modify Group"
@@ -122,12 +137,34 @@ else
 fi
 }
 
+#Deletes a non system group
+groupDel(){
+echo "whitch group do you want to delete?"
+read -p 'Name of group:' gName
+if [ cat /etc/group | egrep $gName | awk -F: '{print $3}' > 999 ]
+then
+groupdel $gName
+else
+echo "you can't delete system groups!"
+fi
+}
+
 folderAdd () {
 read -p 'Path:' move
 read -p 'Name of folder:' fname
 mv $move
 mkdir $fname
 mv $SMHOME
+}
+
+folderList(){
+echo "whitch folder do you want list?"
+read -p 'Path to folder:' fPath
+echo
+echo "content of folder: "
+sleep 0.3
+ls -a $fPath
+echo
 }
 
 folderMod() {
@@ -149,5 +186,35 @@ elif $option=="privilegies";
     
 }
 
+sshmod(){
+echo '*********************************************'
+echo $'\t' "Manage SSH Server"
+echo '---------------------------------------------'
+echo -e ${RED}'in' ${NC}- 'install SSH server'
+echo -e ${RED}'rm' ${NC}- 'remove SSH server'
+echo -e ${RED}'on' ${NC}- 'start SSH server'
+echo -e ${RED}'of' ${NC}- 'stop SSH sever'
+echo '---------------------------------------------'
+read -p 'Choice:' option
+echo
+if [ $option = 'in' ]
+then
+apt install openssh-server
+elif [ $option = 'rm' ]
+then
+apt remove openssh-server
+elif [ $option = 'on' ]
+then
+systemctl start ssh
+echo "SSH is activated"
+elif [ $option = 'of' ]
+then
+systemctl stop ssh
+echo "SSH is deactivated"
+else
+echo "Choice was not valid!"
+echo
+fi
+}
 
 printMenu
