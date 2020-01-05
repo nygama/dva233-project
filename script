@@ -6,27 +6,30 @@
 SMHOME=pwd
 RED='\033[0;31m'
 NC='\033[0m'
+GO=1
 
 #Create menu
 printMenu() {
-echo '*********************************************'
+echo '***************************************************'
 echo $'\t' "SYSTEM MANAGER (BETA)"
-echo '*********************************************'
-echo ua - User Add$'\t'$'\t'"(Create an new user)"
-echo ul - User List$'\t'$'\t'"(List all login users)"
-echo uv - User View$'\t'$'\t'"(View user properties)"
-echo um - User Modify$'\t'"(Modify user properties)"
-echo ud - User Delete$'\t'"(Delete a login user)"
-echo ga - Group Add$'\t'$'\t'"(Create a new group)"
-echo gl - Group List$'\t'$'\t'"(List all groups, not system groups)"
-echo gv - Group View$'\t'$'\t'"(List all users in a group)"
-echo gm - Group Modify$'\t'"(Add/remove user to/from a group)"
-echo gd - Group Delete$'\t'"(Delete a group, not system groups)"
-echo fa - Folder Add$'\t'$'\t'"(Create a new folder)"
-echo fl - Folder List$'\t'$"(View content in a folder)"
-echo fm - Folder Modify$'\t'"(Modify folder properties)"
-echo fd - Folder Delete$'\t'"(Delete a folder)"
-echo ss - SSH Server$'\t'$'\t'"(Manage SSH Server)"
+echo '---------------------------------------------------'
+echo -e ${RED}ua${NC} - User Add$'\t'$'\t'"(Create an new user)"
+echo -e ${RED}ul${NC} - User List$'\t'$'\t'"(List all login users)"
+echo -e ${RED}uv${NC} - User View$'\t'$'\t'"(View user properties)"
+echo -e ${RED}um${NC} - User Modify$'\t'"(Modify user properties)"
+echo -e ${RED}ud${NC} - User Delete$'\t'"(Delete a login user)"
+echo -e ${RED}ga${NC} - Group Add$'\t'$'\t'"(Create a new group)"
+echo -e ${RED}gl${NC} - Group List$'\t'$'\t'"(List all groups, not system groups)"
+echo -e ${RED}gv${NC} - Group View$'\t'$'\t'"(List all users in a group)"
+echo -e ${RED}gm${NC} - Group Modify$'\t'"(Add/remove user to/from a group)"
+echo -e ${RED}gd${NC} - Group Delete$'\t'"(Delete a group, not system groups)"
+echo -e ${RED}fa${NC} - Folder Add$'\t'$'\t'"(Create a new folder)"
+echo -e ${RED}fl${NC} - Folder List$'\t'$"(View content in a folder)"
+echo -e ${RED}fm${NC} - Folder Modify$'\t'"(Modify folder properties)"
+echo -e ${RED}fd${NC} - Folder Delete$'\t'"(Delete a folder)"
+echo -e ${RED}ss${NC} - SSH Server$'\t'$'\t'"(Manage SSH Server)"
+echo -e ${RED}ex${NC} - Exit$'\t'$'\t'"(Exit System Manager)"
+echo '---------------------------------------------------'
 }
 
 #Adds a user with useradd shell prompt
@@ -82,7 +85,7 @@ fi
 }
 
 #modify a user
-usermod() {
+userMod() {
 echo '*********************************************'
 echo -e $'\t' ${RED}'Modify User' ${NC}
 echo '---------------------------------------------'
@@ -147,7 +150,7 @@ do
 done < "$input"
 }
 
-GroupView(){
+groupView(){
 echo "whitch group do you want to view?"
 read -p 'groupname: ' gName
 echo "the members of $gName are: "
@@ -292,7 +295,7 @@ else
 fi
 }
 
-sshmod(){
+sshMod(){
 echo '*********************************************'
 echo $'\t' "Manage SSH Server"
 echo '---------------------------------------------'
@@ -301,7 +304,7 @@ echo -e ${RED}'rm' ${NC}- 'remove SSH server'
 echo -e ${RED}'on' ${NC}- 'start SSH server'
 echo -e ${RED}'of' ${NC}- 'stop SSH sever'
 echo '---------------------------------------------'
-read -p 'Choice:' option
+read -p 'Choice: ' option
 echo
 if [ $option = 'in' ]
 then
@@ -323,4 +326,69 @@ echo
 fi
 }
 
-printMenu
+printHeader(){
+echo '***************************************************'
+echo $'\t' "SYSTEM MANAGER (BETA)"
+echo '---------------------------------------------------'
+}
+
+while [ $GO = 1 ]
+do
+    printMenu
+    read -p 'Choice: ' option
+    
+    if [ $option = 'ua' ]
+    then
+        userAdd
+    elif [ $option = 'ul' ]
+    then
+        userList
+    elif [ $option = 'uv' ]
+    then
+        userView
+    elif [ $option = 'um' ]
+    then
+        userMod
+    elif [ $option = 'ud' ]
+    then
+        userDel
+    elif [ $option = 'ga' ]
+    then
+        groupAdd
+    elif [ $option = 'gl' ]
+    then
+        groupList
+    elif [ $option = 'gv' ]
+    then
+        groupView
+    elif [ $option = 'gm' ]
+    then
+        groupMod
+    elif [ $option = 'gd' ]
+    then
+        groupDel
+    elif [ $option = 'fa' ]
+    then
+        folderAdd
+    elif [ $option = 'fl' ]
+    then
+        folderList
+    elif [ $option = 'fv' ]
+    then
+        folderView
+    elif [ $option = 'fm' ]
+    then
+        folderMod
+    elif [ $option = 'fd' ]
+    then
+        folderDel
+    elif [ $option = 'ss' ]
+    then
+        sshMod
+    elif [ $option = 'ex' ]
+    then
+        GO=0
+    fi
+done
+
+
