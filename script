@@ -207,6 +207,30 @@ ls -a $fPath
 echo
 }
 
+#list folder properties
+folderView(){
+read -p 'path to the folder to view:' foldername
+echo
+ls $foldername &> /dev/null
+if [ $? -eq 2 ]
+then
+        echo "Folder not found"
+else
+
+        echo -n 'Owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+
+        echo -n 'Last modified: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $7 $6}'
+
+        echo -n 'Owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+
+        echo -n 'Owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+fi
+}
+
 folderMod() {
 read -p 'Path:' move
 read -p 'Name of folder' fname
