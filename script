@@ -120,6 +120,16 @@ read -p 'Name of new group: ' gName
 groupadd $gName
 }
 
+groupList() {
+touch users.txt
+input="users.txt"
+awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd > users.txt
+while IFS= read -r line
+do 
+    groups "$line"
+done < "$input"
+}
+
 GroupView(){
 echo "whitch group do you want to view?"
 read -p 'groupname: ' gName
