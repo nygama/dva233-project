@@ -275,6 +275,23 @@ elif $option=="privilegies";
     
 }
 
+folderDel(){
+read -p 'Path to folder to delete: ' DELPATH
+ls $DELPATH &> /dev/null
+if [ $? -eq 2 ]
+then
+    echo "Folder not found"
+else
+    read 'Are you sure about deleting the folder and everything in it? (Yes/n): ' YESNO
+    if [ $YESNO = 'Yes' ]
+    then
+        rm -r $DELPATH
+    else
+        echo 'deletion was stopped'
+    fi
+fi
+}
+
 sshmod(){
 echo '*********************************************'
 echo $'\t' "Manage SSH Server"
