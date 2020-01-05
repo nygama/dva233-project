@@ -46,21 +46,38 @@ echo '---------------------------------------------'
 
 userView() {
 read -p 'User to view:' usrname
-retval = $(grep $usrname)
-if [ $retval -eq 1 ] 
+echo
+grep $usrname /etc/passwd > /dev/null
+if [ $? -eq 1 ]
 then
     echo "User not found"
 else
+
     #Grab users info from /etc/passwd
-    echo "Username: " | egrep -o "$usrname" /etc/passwd
-    echo "Password: " | egrep "$usrname" /etc/passwd | awk -F: '{print $2}'
-    echo "User ID: "  | egrep "$usrname" /etc/passwd | awk -F: '{print $3}'
-    echo "Group ID: " | egrep "$usrname" /etc/passwd | awk -F: '{print $4}'
-    echo "Comment: " | egrep "$usrname" /etc/passwd | awk -F: '{print $5}'
-    echo "Directory: " | cat /etc/passwd | egrep "$usrname" | cut -c":" -f6
-    echo "Shell: " | egrep "$usrname" /etc/passwd | awk -F '{print $7}'
-    echo ""
-    echo "Groups: " | groups "$usrname"
+    echo -n 'Username: '
+    egrep -o "$usrname" /etc/passwd
+
+    echo -n 'Password: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $2}'
+
+    echo -n 'User ID: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $3}'
+
+    echo -n 'Group ID: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $4}'
+
+    echo -n 'Comment: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $5}'
+
+    echo -n 'Directory: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $6}'
+
+    echo -n 'Shell: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $7}'
+
+    echo -n "Groups:"
+    groups "$usrname" | sed s/$usrname\ \:/''/
+    echo
 fi
 }
 
