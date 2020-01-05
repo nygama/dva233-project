@@ -211,24 +211,49 @@ echo
 folderView(){
 read -p 'path to the folder to view:' foldername
 echo
+
 ls $foldername &> /dev/null
 if [ $? -eq 2 ]
 then
         echo "Folder not found"
 else
+        echo "properties for the folder: "
+        echo
 
-        echo -n 'Owner: '
+        echo -ne 'Owner: '
         ls -la $foldername | egrep ' \.$' | awk '{print $3}'
 
-        echo -n 'Last modified: '
-        ls -la $foldername | egrep ' \.$' | awk '{print $7 $6}'
+        echo -ne 'Last modified: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $7 " " $6}'
 
-        echo -n 'Owner: '
-        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+        echo 'Permissions: '
+        echo -ne '  owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '^...'
+        echo -ne '  group: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '^......' | egrep -o '...$'
+        echo -ne '  others: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '...$'
 
-        echo -n 'Owner: '
-        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+        echo -n 'Sticky bit: ':
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep 't' &> /dev/null
+        if [ $? -eq 1 ]
+        then
+                echo No
+        else
+                echo Yes
+        fi
+
+        echo -n 'Setgid: ':
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep 's' &> /dev/null
+        if [ $? -eq 1 ]
+        then
+                echo No
+        else
+                echo Yes
+        fi
+
 fi
+echo
 }
 
 folderMod() {
