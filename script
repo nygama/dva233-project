@@ -163,14 +163,16 @@ echo $'\t' "Modify Group"
 echo '*********************************************'
 echo "Do you want to add to a group or remove from a group?"
 read -p '(add/remove):' input
-if ($input != "add" || $input != "remove"); 
+if [ $input != 'add' || $input != 'remove' ] 
+then 
     echo "Error: No valid input for (add/remove)"
-    fi
+fi
 echo "Which user to modify?:"
 read -p 'Username' usrname
 echo "Which group to add/remove from?:"
 read -p 'Group name:' grpname
-if ($input == "remove");
+if [ $input = "remove" ]
+then
     echo "Removing '$usrname' from group '$grpname'."
     sudo deluser $usrname $grpname
 
@@ -259,9 +261,13 @@ fi
 echo
 }
 
+
 folderMod() {
 read -p 'Path:' move
+ls
 read -p 'Name of folder' fname
+echo '--------------------------------'
+ls -l $fname
 echo "--Options--"
 echo rename $'\t'$'\t' - Rename selected folder.
 echo privilegies $'\t' - Change privilegies for folder. 
@@ -269,14 +275,47 @@ echo stricky bit $'\t' - Change sticky bit.
 echo setgid $'\t'$'\t' - Modify setgid.
 echo lastmod $'\t' - Check and change last modified attribute.
 read -p 'Option:' option
-if $option=="rename";
-    read -p 'New name:' nfname
+if [ $option = 'rename' ]
+then
+    read -p 'New name: ' nfname
     mv $move
     mv $fname $nfname
-elif $option=="privilegies";
-    read -p 'Set privilegies:' priv
-    
+elif [ $option = 'privilegies' ]
+then
+    read -p 'Set privilegies: ' priv
+    chmod $priv $fname
+elif [ $option = 'sticky bit' ]
+then
+    read -p 'Have sticky bit? (yes/no): ' YNanswer
+    if [ $YNanswer = 'yes' ]
+    then
+        chmod +t $fname
+    else
+        chmod -t $fname
+    fi
+elif [ $option = 'setgid' ]
+then
+    read -p 'Set setgid? (yes/no): ' YNanswer
+        if [ $YNanswer = 'yes' ] 
+        then
+            chmod g+s $fname
+        else 
+            chmod g-s $fname
+        fi
+elif [ $option = 'lastmod' ]
+then
+    stat $fname
+    read -p 'Change last modified attribute? (yes/no): ' YNanswer
+    if [ $YNanswer = 'yes' ] 
+    then
+        read -p 'New date and time (YYYYMMDDHHmm): ' date
+        touch -t $date $filename
+    fi
+else 
+    echo "Invalid option"
+fi
 }
+
 
 folderDel(){
 read -p 'Path to folder to delete: ' DELPATH
@@ -390,5 +429,3 @@ do
         GO=0
     fi
 done
-
-
