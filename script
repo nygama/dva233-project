@@ -39,7 +39,7 @@ sudo adduser $usrname
 }
 
 #Lists all users
-userlist() {
+userList() {
 echo '*********************************************'
 echo 'Current login users on the system:'
 echo '---------------------------------------------'
@@ -57,28 +57,28 @@ then
 else
 
     #Grab users info from /etc/passwd
-    echo -n 'Username: '
-    egrep -o "$usrname" /etc/passwd
+    echo -ne 'Username:\t'
+    echo "$usrname"
 
-    echo -n 'Password: '
+    echo -ne 'Password:\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $2}'
 
-    echo -n 'User ID: '
+    echo -ne 'User ID:\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $3}'
 
-    echo -n 'Group ID: '
+    echo -ne 'Group ID:\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $4}'
 
-    echo -n 'Comment: '
+    echo -ne 'Comment:\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $5}'
 
-    echo -n 'Directory: '
+    echo -ne 'Directory:\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $6}'
 
-    echo -n 'Shell: '
+    echo -ne 'Shell:\t\t'
     egrep "$usrname" /etc/passwd | awk -F: '{print $7}'
 
-    echo -n "Groups:"
+    echo -ne "Groups:\t\t"
     groups "$usrname" | sed s/$usrname\ \:/''/
     echo
 fi
