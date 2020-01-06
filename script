@@ -40,11 +40,10 @@ sudo adduser $usrname
 
 #Lists all users
 userList() {
-echo '*********************************************'
 echo 'Current login users on the system:'
-echo '---------------------------------------------'
+echo '- - - - - - - - - - - - - - - - - - - - - - - - - -'
 awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
-echo '---------------------------------------------'
+echo '---------------------------------------------------'
 }
 
 userView() {
@@ -82,14 +81,11 @@ else
     groups "$usrname" | sed s/$usrname\ \:/''/
     echo
 fi
+echo '---------------------------------------------------'
 }
 
 #modify a user
 userMod() {
-echo '*********************************************'
-echo -e $'\t' ${RED}'Modify User' ${NC}
-echo '---------------------------------------------'
-echo "Which user to modify?"
 read -p 'User to modify:' usrname
 echo "what do you want to modify? Your oprions are:"
 echo -e ${RED} 'Nm' ${NC} ' - (Name)'
@@ -123,8 +119,7 @@ elif [ $modoption = "Nm" ]
 then
         usermod -l $newmod $usrname
 fi
-echo
-echo
+echo '---------------------------------------------------'
 }
 
 #Delete user including home directory
@@ -137,7 +132,14 @@ sudo userdel -r $usrname
 #add a group
 groupAdd() {
 read -p 'Name of new group: ' gName
-groupadd $gName
+groupadd $gName &> /dev/null
+if [ $? = 2 ]
+then
+    echo 'Group alreaddy exists or invalid input'
+else
+    echo 'Done'
+fi
+echo '---------------------------------------------------'
 }
 
 groupList() {
@@ -148,6 +150,7 @@ while IFS= read -r line
 do 
     groups "$line"
 done < "$input"
+echo '---------------------------------------------------'
 }
 
 groupView(){
@@ -155,12 +158,10 @@ echo "whitch group do you want to view?"
 read -p 'groupname: ' gName
 echo "the members of $gName are: "
 cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+echo '---------------------------------------------------'
 }
 
 groupMod() {
-echo '*********************************************'
-echo $'\t' "Modify Group"
-echo '*********************************************'
 echo "Do you want to add to a group or remove from a group?"
 read -p '(add/remove):' input
 if [ $input != 'add' || $input != 'remove' ] 
@@ -180,6 +181,7 @@ else
     echo "Adding '$username' to group '$grpname'."
     sudo usermod -a -G $grpname $usrname
 fi
+echo '---------------------------------------------------'
 }
 
 #Deletes a non system group
@@ -189,27 +191,36 @@ read -p 'Name of group:' gName
 if [ cat /etc/group | egrep $gName | awk -F: '{print $3}' > 999 ]
 then
 groupdel $gName
+echo 'Done'
 else
 echo "you can't delete system groups!"
 fi
+echo '---------------------------------------------------'
 }
 
 folderAdd () {
-read -p 'Path:' move
+read -p 'Path to new folder:' move
 read -p 'Name of folder:' fname
-mv $move
+cd $move
 mkdir $fname
-mv $SMHOME
+cd $SMHOME
+echo '---------------------------------------------------'
 }
 
 folderList(){
 echo "whitch folder do you want list?"
 read -p 'Path to folder:' fPath
-echo
-echo "content of folder: "
-sleep 0.3
-ls -a $fPath
-echo
+ls $fPath &> /dev/null
+if [ $? -eq 2 ]
+then
+        echo "Folder not found"
+else
+    echo
+    echo "content of folder: "
+    ls -a $fPath
+    echo
+fi
+echo '---------------------------------------------------'
 }
 
 #list folder properties
@@ -259,11 +270,12 @@ else
 
 fi
 echo
+echo '---------------------------------------------------'
 }
 
 
 folderMod() {
-read -p 'Path:' move
+read -p 'Path of folder to modify: ' move
 ls
 read -p 'Name of folder' fname
 echo '--------------------------------'
@@ -314,6 +326,7 @@ then
 else 
     echo "Invalid option"
 fi
+echo '---------------------------------------------------'
 }
 
 
@@ -332,17 +345,17 @@ else
         echo 'deletion was stopped'
     fi
 fi
+echo '---------------------------------------------------'
 }
 
 sshMod(){
-echo '*********************************************'
-echo $'\t' "Manage SSH Server"
-echo '---------------------------------------------'
+echo -e ${RED}'\tManage SSH Server'
+echo '- - - - - - - - - - - - - - - - - - - - - - - - - -'
 echo -e ${RED}'in' ${NC}- 'install SSH server'
 echo -e ${RED}'rm' ${NC}- 'remove SSH server'
 echo -e ${RED}'on' ${NC}- 'start SSH server'
 echo -e ${RED}'of' ${NC}- 'stop SSH sever'
-echo '---------------------------------------------'
+echo '---------------------------------------------------'
 read -p 'Choice: ' option
 echo
 if [ $option = 'in' ]
@@ -363,6 +376,7 @@ else
 echo "Choice was not valid!"
 echo
 fi
+echo '---------------------------------------------------'
 }
 
 printHeader(){
@@ -373,57 +387,76 @@ echo '---------------------------------------------------'
 
 while [ $GO = 1 ]
 do
+    clear
     printMenu
     read -p 'Choice: ' option
+    clear
+    printHeader
     
     if [ $option = 'ua' ]
     then
         userAdd
+        read -p 'Press enter to continue...'
     elif [ $option = 'ul' ]
     then
         userList
+        read -p 'Press enter to continue...'
     elif [ $option = 'uv' ]
     then
         userView
+        read -p 'Press enter to continue...'
     elif [ $option = 'um' ]
     then
         userMod
+        read -p 'Press enter to continue...'
     elif [ $option = 'ud' ]
     then
         userDel
+        read -p 'Press enter to continue...'
     elif [ $option = 'ga' ]
     then
         groupAdd
+        read -p 'Press enter to continue...'
     elif [ $option = 'gl' ]
     then
         groupList
+        read -p 'Press enter to continue...'
     elif [ $option = 'gv' ]
     then
         groupView
+        read -p 'Press enter to continue...'
     elif [ $option = 'gm' ]
     then
         groupMod
+        read -p 'Press enter to continue...'
     elif [ $option = 'gd' ]
     then
         groupDel
+        read -p 'Press enter to continue...'
     elif [ $option = 'fa' ]
     then
         folderAdd
+        read -p 'Press enter to continue...'
     elif [ $option = 'fl' ]
     then
         folderList
+        read -p 'Press enter to continue...'
     elif [ $option = 'fv' ]
     then
         folderView
+        read -p 'Press enter to continue...'
     elif [ $option = 'fm' ]
     then
         folderMod
+        read -p 'Press enter to continue...'
     elif [ $option = 'fd' ]
     then
         folderDel
+        read -p 'Press enter to continue...'
     elif [ $option = 'ss' ]
     then
         sshMod
+        read -p 'Press enter to continue...'
     elif [ $option = 'ex' ]
     then
         GO=0
