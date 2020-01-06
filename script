@@ -3,42 +3,128 @@
 
 #GLOBAL VARIABLES
 # The home directory of System Manager.
-SMHOME = pwd
+SMHOME=pwd
+RED='\033[0;31m'
+NC='\033[0m'
+GO=1
 
 #Create menu
 printMenu() {
-echo '*********************************************'
+echo '***************************************************'
 echo $'\t' "SYSTEM MANAGER (BETA)"
-echo '*********************************************'
-echo ua - User Add$'\t'$'\t'"(Create an new user)"
-echo ul - User List$'\t'$'\t'"(List all login users)"
-echo uv - User View$'\t'$'\t'"(View user properties)"
-echo um - User Modify$'\t'"(Modify user properties)"
-echo ud - User Delete$'\t'"(Delete a login user)"
-echo ga - Group Add$'\t'$'\t'"(Create a new group)"
-echo gl - Group List$'\t'$'\t'"(List all groups, not system groups)"
-echo gv - Group View$'\t'$'\t'"(List all users in a group)"
-echo gm - Group Modify$'\t'"(Add/remove user to/from a group)"
-echo gd - Group Delete$'\t'"(Delete a group, not system groups)"
-echo fa - Folder Add$'\t'$'\t'"(Create a new folder)"
-echo fl - Folder List$'\t'$"(View content in a folder)"
-echo fm - Folder Modify$'\t'"(Modify folder properties)"
-echo fd - Folder Delete$'\t'"(Delete a folder)"
-echo ss - SSH Server$'\t'$'\t'"(Manage SSH Server)"
+echo '---------------------------------------------------'
+echo -e ${RED}ua${NC} - User Add$'\t'$'\t'"(Create an new user)"
+echo -e ${RED}ul${NC} - User List$'\t'$'\t'"(List all login users)"
+echo -e ${RED}uv${NC} - User View$'\t'$'\t'"(View user properties)"
+echo -e ${RED}um${NC} - User Modify$'\t'"(Modify user properties)"
+echo -e ${RED}ud${NC} - User Delete$'\t'"(Delete a login user)"
+echo -e ${RED}ga${NC} - Group Add$'\t'$'\t'"(Create a new group)"
+echo -e ${RED}gl${NC} - Group List$'\t'$'\t'"(List all groups, not system groups)"
+echo -e ${RED}gv${NC} - Group View$'\t'$'\t'"(List all users in a group)"
+echo -e ${RED}gm${NC} - Group Modify$'\t'"(Add/remove user to/from a group)"
+echo -e ${RED}gd${NC} - Group Delete$'\t'"(Delete a group, not system groups)"
+echo -e ${RED}fa${NC} - Folder Add$'\t'$'\t'"(Create a new folder)"
+echo -e ${RED}fl${NC} - Folder List$'\t'$"(View content in a folder)"
+echo -e ${RED}fm${NC} - Folder Modify$'\t'"(Modify folder properties)"
+echo -e ${RED}fd${NC} - Folder Delete$'\t'"(Delete a folder)"
+echo -e ${RED}ss${NC} - SSH Server$'\t'$'\t'"(Manage SSH Server)"
+echo -e ${RED}ex${NC} - Exit$'\t'$'\t'"(Exit System Manager)"
+echo '---------------------------------------------------'
 }
 
 #Adds a user with useradd shell prompt
 userAdd() {
 read -p 'Username:' usrname
-sudo useradd $usrname
+sudo adduser $usrname
+}
+
+#Lists all users
+userlist() {
+echo '*********************************************'
+echo 'Current login users on the system:'
+echo '---------------------------------------------'
+awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
+echo '---------------------------------------------'
 }
 
 userView() {
-# Read all user IDs.
-# -F sepstring.
-echo ----------------------------------------
-echo Current login users on the system:
-awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd
+read -p 'User to view:' usrname
+echo
+grep $usrname /etc/passwd > /dev/null
+if [ $? -eq 1 ]
+then
+    echo "User not found"
+else
+
+    #Grab users info from /etc/passwd
+    echo -n 'Username: '
+    egrep -o "$usrname" /etc/passwd
+
+    echo -n 'Password: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $2}'
+
+    echo -n 'User ID: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $3}'
+
+    echo -n 'Group ID: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $4}'
+
+    echo -n 'Comment: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $5}'
+
+    echo -n 'Directory: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $6}'
+
+    echo -n 'Shell: '
+    egrep "$usrname" /etc/passwd | awk -F: '{print $7}'
+
+    echo -n "Groups:"
+    groups "$usrname" | sed s/$usrname\ \:/''/
+    echo
+fi
+}
+
+#modify a user
+userMod() {
+echo '*********************************************'
+echo -e $'\t' ${RED}'Modify User' ${NC}
+echo '---------------------------------------------'
+echo "Which user to modify?"
+read -p 'User to modify:' usrname
+echo "what do you want to modify? Your oprions are:"
+echo -e ${RED} 'Nm' ${NC} ' - (Name)'
+echo -e ${RED} 'Pw' ${NC} ' - (Password)'
+echo -e ${RED} 'Ud' ${NC} ' - (User ID)'
+echo -e ${RED} 'Gd' ${NC} ' - (Group ID)'
+echo -e ${RED} 'Cm' ${NC} ' - (Comment)'
+echo -e ${RED} 'Hd' ${NC} ' - (Home ditectory)'
+echo -e ${RED} 'Sh' ${NC} ' - (Shell)'
+read -p 'Option to modify: ' modoption
+read -p 'New value: ' newmod
+if [ $modoption = "Pw" ]
+then
+        usermod -p $newmod $usrname
+elif [ $modoption = "Ud" ]
+then
+        usermod -u $newmod $usrname
+elif [ $modoption = "Gd" ]
+then
+        usermod -g $newmod $usrname
+elif [ $modoption = "Cm" ]
+then
+        usermod -c $newmod $usrname
+elif [ $modoption = "Hd" ]
+then
+        usermod -d $newmod $usrname
+elif [ $modoption = "Sh" ]
+then
+        usermod -s $newmod $usrname
+elif [ $modoption = "Nm" ]
+then
+        usermod -l $newmod $usrname
+fi
+echo
+echo
 }
 
 #Delete user including home directory
@@ -46,6 +132,29 @@ userDel() {
 echo "WARNING: You are about to delete a user."
 read -p 'User to remove:' usrname
 sudo userdel -r $usrname
+}
+
+#add a group
+groupAdd() {
+read -p 'Name of new group: ' gName
+groupadd $gName
+}
+
+groupList() {
+touch users.txt
+input="users.txt"
+awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd > users.txt
+while IFS= read -r line
+do 
+    groups "$line"
+done < "$input"
+}
+
+groupView(){
+echo "whitch group do you want to view?"
+read -p 'groupname: ' gName
+echo "the members of $gName are: "
+cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
 }
 
 groupMod() {
@@ -71,12 +180,83 @@ else
 fi
 }
 
+#Deletes a non system group
+groupDel(){
+echo "whitch group do you want to delete?"
+read -p 'Name of group:' gName
+if [ cat /etc/group | egrep $gName | awk -F: '{print $3}' > 999 ]
+then
+groupdel $gName
+else
+echo "you can't delete system groups!"
+fi
+}
+
 folderAdd () {
 read -p 'Path:' move
 read -p 'Name of folder:' fname
 mv $move
 mkdir $fname
 mv $SMHOME
+}
+
+folderList(){
+echo "whitch folder do you want list?"
+read -p 'Path to folder:' fPath
+echo
+echo "content of folder: "
+sleep 0.3
+ls -a $fPath
+echo
+}
+
+#list folder properties
+folderView(){
+read -p 'path to the folder to view:' foldername
+echo
+
+ls $foldername &> /dev/null
+if [ $? -eq 2 ]
+then
+        echo "Folder not found"
+else
+        echo "properties for the folder: "
+        echo
+
+        echo -ne 'Owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $3}'
+
+        echo -ne 'Last modified: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $7 " " $6}'
+
+        echo 'Permissions: '
+        echo -ne '  owner: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '^...'
+        echo -ne '  group: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '^......' | egrep -o '...$'
+        echo -ne '  others: '
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep -o '...$'
+
+        echo -n 'Sticky bit: ':
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep 't' &> /dev/null
+        if [ $? -eq 1 ]
+        then
+                echo No
+        else
+                echo Yes
+        fi
+
+        echo -n 'Setgid: ':
+        ls -la $foldername | egrep ' \.$' | awk '{print $1}' | egrep -o .........$ | egrep 's' &> /dev/null
+        if [ $? -eq 1 ]
+        then
+                echo No
+        else
+                echo Yes
+        fi
+
+fi
+echo
 }
 
 folderMod() {
@@ -133,4 +313,119 @@ else
 fi
 }
 
-printMenu
+
+folderDel(){
+read -p 'Path to folder to delete: ' DELPATH
+ls $DELPATH &> /dev/null
+if [ $? -eq 2 ]
+then
+    echo "Folder not found"
+else
+    read 'Are you sure about deleting the folder and everything in it? (Yes/n): ' YESNO
+    if [ $YESNO = 'Yes' ]
+    then
+        rm -r $DELPATH
+    else
+        echo 'deletion was stopped'
+    fi
+fi
+}
+
+sshMod(){
+echo '*********************************************'
+echo $'\t' "Manage SSH Server"
+echo '---------------------------------------------'
+echo -e ${RED}'in' ${NC}- 'install SSH server'
+echo -e ${RED}'rm' ${NC}- 'remove SSH server'
+echo -e ${RED}'on' ${NC}- 'start SSH server'
+echo -e ${RED}'of' ${NC}- 'stop SSH sever'
+echo '---------------------------------------------'
+read -p 'Choice: ' option
+echo
+if [ $option = 'in' ]
+then
+apt install openssh-server
+elif [ $option = 'rm' ]
+then
+apt remove openssh-server
+elif [ $option = 'on' ]
+then
+systemctl start ssh
+echo "SSH is activated"
+elif [ $option = 'of' ]
+then
+systemctl stop ssh
+echo "SSH is deactivated"
+else
+echo "Choice was not valid!"
+echo
+fi
+}
+
+printHeader(){
+echo '***************************************************'
+echo $'\t' "SYSTEM MANAGER (BETA)"
+echo '---------------------------------------------------'
+}
+
+while [ $GO = 1 ]
+do
+    printMenu
+    read -p 'Choice: ' option
+    
+    if [ $option = 'ua' ]
+    then
+        userAdd
+    elif [ $option = 'ul' ]
+    then
+        userList
+    elif [ $option = 'uv' ]
+    then
+        userView
+    elif [ $option = 'um' ]
+    then
+        userMod
+    elif [ $option = 'ud' ]
+    then
+        userDel
+    elif [ $option = 'ga' ]
+    then
+        groupAdd
+    elif [ $option = 'gl' ]
+    then
+        groupList
+    elif [ $option = 'gv' ]
+    then
+        groupView
+    elif [ $option = 'gm' ]
+    then
+        groupMod
+    elif [ $option = 'gd' ]
+    then
+        groupDel
+    elif [ $option = 'fa' ]
+    then
+        folderAdd
+    elif [ $option = 'fl' ]
+    then
+        folderList
+    elif [ $option = 'fv' ]
+    then
+        folderView
+    elif [ $option = 'fm' ]
+    then
+        folderMod
+    elif [ $option = 'fd' ]
+    then
+        folderDel
+    elif [ $option = 'ss' ]
+    then
+        sshMod
+    elif [ $option = 'ex' ]
+    then
+        GO=0
+    fi
+done
+
+
+
