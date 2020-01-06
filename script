@@ -3,7 +3,7 @@
 
 #GLOBAL VARIABLES
 # The home directory of System Manager.
-SMHOME=pwd
+SMHOME=$pwd
 RED='\033[0;31m'
 NC='\033[0m'
 GO=1
@@ -25,6 +25,7 @@ echo -e ${RED}gm${NC} - Group Modify$'\t'"(Add/remove user to/from a group)"
 echo -e ${RED}gd${NC} - Group Delete$'\t'"(Delete a group, not system groups)"
 echo -e ${RED}fa${NC} - Folder Add$'\t'$'\t'"(Create a new folder)"
 echo -e ${RED}fl${NC} - Folder List$'\t'$"(View content in a folder)"
+echo -e ${RED}fv${NC} - Folder View$'\t'$"(View the properies of a folder)"
 echo -e ${RED}fm${NC} - Folder Modify$'\t'"(Modify folder properties)"
 echo -e ${RED}fd${NC} - Folder Delete$'\t'"(Delete a folder)"
 echo -e ${RED}ss${NC} - SSH Server$'\t'$'\t'"(Manage SSH Server)"
@@ -34,8 +35,10 @@ echo '---------------------------------------------------'
 
 #Adds a user with useradd shell prompt
 userAdd() {
-read -p 'Username:' usrname
-sudo adduser $usrname
+read -p 'Username of new user: ' usrname
+echo
+adduser $usrname
+echo '---------------------------------------------------'
 }
 
 #Lists all users
@@ -99,25 +102,25 @@ read -p 'Option to modify: ' modoption
 read -p 'New value: ' newmod
 if [ $modoption = "Pw" ]
 then
-        usermod -p $newmod $usrname
+        usermod -p "$newmod" $usrname
 elif [ $modoption = "Ud" ]
 then
-        usermod -u $newmod $usrname
+        usermod -u "$newmod" $usrname
 elif [ $modoption = "Gd" ]
 then
-        usermod -g $newmod $usrname
+        usermod -g "$newmod" $usrname
 elif [ $modoption = "Cm" ]
 then
-        usermod -c $newmod $usrname
+        usermod -c "$newmod" $usrname
 elif [ $modoption = "Hd" ]
 then
-        usermod -d $newmod $usrname
+        usermod -d "$newmod" $usrname
 elif [ $modoption = "Sh" ]
 then
-        usermod -s $newmod $usrname
+        usermod -s "$newmod" $usrname
 elif [ $modoption = "Nm" ]
 then
-        usermod -l $newmod $usrname
+        usermod -l "$newmod" $usrname
 fi
 echo '---------------------------------------------------'
 }
@@ -126,7 +129,7 @@ echo '---------------------------------------------------'
 userDel() {
 echo "WARNING: You are about to delete a user."
 read -p 'User to remove:' usrname
-sudo userdel -r $usrname
+userdel -r $usrname &> /dev/null
 }
 
 #add a group
@@ -143,43 +146,41 @@ echo '---------------------------------------------------'
 }
 
 groupList() {
-touch users.txt
-input="users.txt"
-awk -F: '$3 >= 1000 && $4 <= 60000 && $1 != "nobody" {print $1}' /etc/passwd > users.txt
-while IFS= read -r line
-do 
-    groups "$line"
-done < "$input"
+echo 'Current non system groups on the system:'
+echo '- - - - - - - - - - - - - - - - - - - - - - - - - -'
+awk -F: '$3 >= 1000  && $1 != "nogroup" {print $1}' /etc/group
 echo '---------------------------------------------------'
 }
 
 groupView(){
 echo "whitch group do you want to view?"
 read -p 'groupname: ' gName
+echo
 echo "the members of $gName are: "
-cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+cat /etc/group | egrep $gName | awk -F: '{print "  "$4}' | sed y/,/'\n'/
 echo '---------------------------------------------------'
 }
 
 groupMod() {
 echo "Do you want to add to a group or remove from a group?"
 read -p '(add/remove):' input
-if [ $input != 'add' || $input != 'remove' ] 
+if [ $input = "add" ] 
 then 
-    echo "Error: No valid input for (add/remove)"
-fi
-echo "Which user to modify?:"
-read -p 'Username' usrname
-echo "Which group to add/remove from?:"
-read -p 'Group name:' grpname
-if [ $input = "remove" ]
+    echo "Which user to modify?:"
+    read -p 'Username: ' usrname
+    echo "Which group to add/remove from?:"
+    read -p 'Group name: ' grpname
+    echo "Adding $usrname to group $grpname."
+    usermod -a -G $grpname $usrname
+elif [ $input = "remove" ]
 then
-    echo "Removing '$usrname' from group '$grpname'."
-    sudo deluser $usrname $grpname
-
+    echo "Which user to modify?:"
+    read -p 'Username: ' usrname
+    echo "Which group to add/remove from?:"
+    read -p 'Group name: ' grpname
+    deluser $usrname $grpname
 else
-    echo "Adding '$username' to group '$grpname'."
-    sudo usermod -a -G $grpname $usrname
+    echo "Error: No valid input for (add/remove)"
 fi
 echo '---------------------------------------------------'
 }
@@ -203,7 +204,6 @@ read -p 'Path to new folder:' move
 read -p 'Name of folder:' fname
 cd $move
 mkdir $fname
-cd $SMHOME
 echo '---------------------------------------------------'
 }
 
@@ -337,9 +337,10 @@ if [ $? -eq 2 ]
 then
     echo "Folder not found"
 else
-    read 'Are you sure about deleting the folder and everything in it? (Yes/n): ' YESNO
+    read -p 'Are you sure about deleting the folder and everything in it? (Yes/n): ' YESNO
     if [ $YESNO = 'Yes' ]
     then
+        echo "removing the folder"
         rm -r $DELPATH
     else
         echo 'deletion was stopped'
@@ -351,6 +352,7 @@ echo '---------------------------------------------------'
 sshMod(){
 echo -e ${RED}'\tManage SSH Server'
 echo '- - - - - - - - - - - - - - - - - - - - - - - - - -'
+echo
 echo -e ${RED}'in' ${NC}- 'install SSH server'
 echo -e ${RED}'rm' ${NC}- 'remove SSH server'
 echo -e ${RED}'on' ${NC}- 'start SSH server'
@@ -360,21 +362,31 @@ read -p 'Choice: ' option
 echo
 if [ $option = 'in' ]
 then
-apt install openssh-server
+    apt install openssh-server
 elif [ $option = 'rm' ]
 then
-apt remove openssh-server
+    apt remove openssh-server
 elif [ $option = 'on' ]
 then
-systemctl start ssh
-echo "SSH is activated"
+    systemctl start ssh
+    if [ $? = 0 ]
+    then
+        echo "SSH is activated"
+    else
+        echo "unable to start ssh-server"
+    fi
 elif [ $option = 'of' ]
 then
-systemctl stop ssh
-echo "SSH is deactivated"
+    systemctl stop ssh
+    if [ $? = 0 ]
+    then
+        echo "SSH is deactivated"
+    else
+        echo "unable to stop ssh-server"
+    fi
 else
-echo "Choice was not valid!"
-echo
+    echo "Choice was not valid!"
+    echo
 fi
 echo '---------------------------------------------------'
 }
