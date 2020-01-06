@@ -163,14 +163,16 @@ echo $'\t' "Modify Group"
 echo '*********************************************'
 echo "Do you want to add to a group or remove from a group?"
 read -p '(add/remove):' input
-if ($input != "add" || $input != "remove"); 
+if [ $input != 'add' || $input != 'remove' ] 
+then 
     echo "Error: No valid input for (add/remove)"
-    fi
+fi
 echo "Which user to modify?:"
 read -p 'Username' usrname
 echo "Which group to add/remove from?:"
 read -p 'Group name:' grpname
-if ($input == "remove");
+if [ $input = "remove" ]
+then
     echo "Removing '$usrname' from group '$grpname'."
     sudo deluser $usrname $grpname
 
@@ -258,6 +260,7 @@ else
 fi
 echo
 }
+
 
 folderMod() {
 read -p 'Path:' move
@@ -426,6 +429,3 @@ do
         GO=0
     fi
 done
-
-
-
