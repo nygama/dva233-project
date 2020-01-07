@@ -90,37 +90,43 @@ echo '---------------------------------------------------'
 #modify a user
 userMod() {
 read -p 'User to modify:' usrname
-echo "what do you want to modify? Your oprions are:"
-echo -e ${RED} 'Nm' ${NC} ' - (Name)'
-echo -e ${RED} 'Pw' ${NC} ' - (Password)'
-echo -e ${RED} 'Ud' ${NC} ' - (User ID)'
-echo -e ${RED} 'Gd' ${NC} ' - (Group ID)'
-echo -e ${RED} 'Cm' ${NC} ' - (Comment)'
-echo -e ${RED} 'Hd' ${NC} ' - (Home ditectory)'
-echo -e ${RED} 'Sh' ${NC} ' - (Shell)'
-read -p 'Option to modify: ' modoption
-read -p 'New value: ' newmod
-if [ $modoption = "Pw" ]
+grep "$usrname" /etc/passwd > /dev/null
+if [ $? -eq 1 ]
 then
-        usermod -p "$newmod" $usrname
-elif [ $modoption = "Ud" ]
-then
-        usermod -u "$newmod" $usrname
-elif [ $modoption = "Gd" ]
-then
-        usermod -g "$newmod" $usrname
-elif [ $modoption = "Cm" ]
-then
-        usermod -c "$newmod" $usrname
-elif [ $modoption = "Hd" ]
-then
-        usermod -d "$newmod" $usrname
-elif [ $modoption = "Sh" ]
-then
-        usermod -s "$newmod" $usrname
-elif [ $modoption = "Nm" ]
-then
-        usermod -l "$newmod" $usrname
+    echo "User not found"
+else
+    echo "what do you want to modify? Your oprions are:"
+    echo -e ${RED} 'Nm' ${NC} ' - (Name)'
+    echo -e ${RED} 'Pw' ${NC} ' - (Password)'
+    echo -e ${RED} 'Ud' ${NC} ' - (User ID)'
+    echo -e ${RED} 'Gd' ${NC} ' - (Group ID)'
+    echo -e ${RED} 'Cm' ${NC} ' - (Comment)'
+    echo -e ${RED} 'Hd' ${NC} ' - (Home ditectory)'
+    echo -e ${RED} 'Sh' ${NC} ' - (Shell)'
+    read -p 'Option to modify: ' modoption
+    read -p 'New value: ' newmod
+    if [ $modoption = "Pw" ]
+    then
+            usermod -p "$newmod" $usrname
+    elif [ $modoption = "Ud" ]
+    then
+            usermod -u "$newmod" $usrname
+    elif [ $modoption = "Gd" ]
+    then
+            usermod -g "$newmod" $usrname
+    elif [ $modoption = "Cm" ]
+    then
+            usermod -c "$newmod" $usrname
+    elif [ $modoption = "Hd" ]
+    then
+            usermod -d "$newmod" $usrname
+    elif [ $modoption = "Sh" ]
+    then
+            usermod -s "$newmod" $usrname
+    elif [ $modoption = "Nm" ]
+    then
+            usermod -l "$newmod" $usrname
+    fi
 fi
 echo '---------------------------------------------------'
 }
@@ -129,12 +135,18 @@ echo '---------------------------------------------------'
 userDel() {
 echo "WARNING: You are about to delete a user."
 read -p 'User to remove:' usrname
-userdel -r $usrname &> /dev/null
-if [ $? = 0 ]
+grep "$usrname" /etc/passwd > /dev/null
+if [ $? -eq 1 ]
 then
-    echo "Done"
+    echo "User not found"
 else
-    echo "unable to delete user"
+    userdel -r $usrname &> /dev/null
+    if [ $? = 0 ]
+    then
+        echo "Done"
+    else
+        echo "unable to delete user"
+    fi
 fi
 echo '---------------------------------------------------'
 }
@@ -162,32 +174,51 @@ echo '---------------------------------------------------'
 groupView(){
 echo "whitch group do you want to view?"
 read -p 'groupname: ' gName
-echo
-echo "the members of $gName are: "
-cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+grep "$gName" /etc/group &> /dev/null
+if [ $? -eq 1 ]
+then
+    echo "Group not found"
+else
+    echo
+    echo "the members of $gName are: "
+    cat /etc/group | egrep $gName | awk -F: '{print $4}' | sed y/,/'\n'/
+fi
 echo '---------------------------------------------------'
 }
 
 groupMod() {
 echo "Do you want to add to a group or remove from a group?"
 read -p '(add/remove):' input
-if [ $input = "add" ] 
-then 
-    echo "Which user to (add/remove)?:"
-    read -p 'Username: ' usrname
-    echo "Which group to add/remove from?:"
-    read -p 'Group name: ' grpname
-    echo "Adding $usrname to group $grpname."
-    usermod -a -G $grpname $usrname
-elif [ $input = "remove" ]
+echo
+echo "Which user to (add/remove)?:"
+read -p 'Username: ' usrname
+
+grep "$usrname" /etc/passwd &> /dev/null
+if [ $? -eq 1 ]
 then
-    echo "Which user to modify?:"
-    read -p 'Username: ' usrname
+    echo "User not found"
+else
+    echo
     echo "Which group to add/remove from?:"
     read -p 'Group name: ' grpname
-    deluser $usrname $grpname 
-else
-    echo "Error: No valid input for (add/remove)"
+    grep "$grpname" /etc/group &> /dev/null
+    if [ $? -eq 1 ]
+    then
+        echo "Group not found"
+    else
+    
+        if [ $input = "add" ] 
+        then 
+            echo "Adding $usrname to group $grpname."
+            usermod -a -G $grpname $usrname
+        elif [ $input = "remove" ]
+        then
+            deluser $usrname $grpname &> /dev/null
+            echo 'The user is now removed in the group'
+        else
+            echo "Error: No valid input for (add/remove)"
+        fi
+    fi
 fi
 echo '---------------------------------------------------'
 }
@@ -196,16 +227,23 @@ echo '---------------------------------------------------'
 groupDel(){
 echo "whitch group do you want to delete?"
 read -p 'Name of group:' gName
-echo
-if [ $(cat /etc/group | egrep $gName | awk -F: '{print $3}') -gt 999 ]
+
+grep "$grpname" /etc/group &> /dev/null
+if [ $? -eq 1 ]
 then
-    groupdel $gName
-    if [ $? = 0 ]
-    then
-        echo 'Done'
-    fi
+    echo "Group not found"
 else
-    echo "you can't delete system groups!"
+    echo
+    if [ $(cat /etc/group | egrep $gName | awk -F: '{print $3}') -gt 999 ]
+    then
+        groupdel $gName
+        if [ $? = 0 ]
+        then
+            echo 'Done'
+        fi
+    else
+        echo "you can't delete system groups!"
+    fi
 fi
 echo '---------------------------------------------------'
 }
@@ -287,56 +325,62 @@ echo '---------------------------------------------------'
 
 folderMod() {
 read -p 'Path of folder to modify: ' fname
+ls $fname &> /dev/null
+if [ $? -eq 2 ]
+then
+        echo "Folder not found"
+else
+    echo
+    echo -e "\t--Options--"
+    echo
+    echo -e ${RED}rn${NC} $'\t' - Rename selected folder.
+    echo -e ${RED}pr${NC} $'\t' - Change privilegies for folder.
+    echo -e ${RED}st${NC} $'\t' - Change sticky bit.
+    echo -e ${RED}sg${NC} $'\t' - Modify setgid.
+    echo -e ${RED}lm${NC} $'\t' - Change last modified attribute.
+    echo
+    read -p 'Option: ' option
 
-echo "--Options--"
-echo rename $'\t'$'\t' - Rename selected folder.
-echo privilegies $'\t' - Change privilegies for folder.
-echo sticky bit $'\t' - Change sticky bit.
-echo setgid $'\t'$'\t' - Modify setgid.
-#echo lastmod $'\t' - Check and change last modified attribute.
-read -p 'Option: ' option
-
-if [ $option = 'rename' ]
-then
-    read -p 'New name: ' nfname
-    mv $fname "$fname/../$nfname"
-    
-elif [ $option = 'privilegies' ]
-then
-    read -p 'Set privilegies: ' priv
-    chmod $priv $fname
-    
-elif [ $option = 'sticky bit' ]
-then
-    read -p 'Have sticky bit? (yes/no): ' YNanswer
-    if [ $YNanswer = 'yes' ]
+    if [ $option = 'rn' ]
     then
-        chmod +t $fname
-    else
-        chmod -t $fname
-    fi
-    
-elif [ $option = 'setgid' ]
-then
-    read -p 'Set setgid? (yes/no): ' YNanswer
-        if [ $YNanswer = 'yes' ] 
+        read -p 'New name: ' nfname
+        mv $fname "$fname/../$nfname"
+
+    elif [ $option = 'pr' ]
+    then
+        read -p 'Set privilegies for user, group or others? (u/g/o): ' UGO
+        read -p 'What privlage do you want to change? Read, Write, Execute (r/w/x): ' RWX
+        read -p 'Do you want to add or remove this privilage? (+/-)' ADDRM
+
+        chmod $UGO$ADDRM$RWX $fname
+
+    elif [ $option = 'st' ]
+    then
+        read -p 'Have sticky bit? (yes/no): ' YNanswer
+        if [ $YNanswer = 'yes' ]
         then
-            chmod g+s $fname
-        else 
-            chmod g-s $fname
+            chmod +t $fname
+        else
+            chmod -t $fname
         fi
-        
-elif [ $option = 'lastmod' ]
-then
-    stat $fname
-    read -p 'Change last modified attribute? (yes/no): ' YNanswer
-    if [ $YNanswer = 'yes' ] 
+
+    elif [ $option = 'sg' ]
+    then
+        read -p 'Set setgid? (yes/no): ' YNanswer
+            if [ $YNanswer = 'yes' ] 
+            then
+                chmod g+s $fname
+            else 
+                chmod g-s $fname
+            fi
+
+    elif [ $option = 'lm' ]
     then
         read -p 'New date and time (YYYYMMDDHHmm): ' date
         touch -t $date $fname
+    else 
+        echo "Invalid option"
     fi
-else 
-    echo "Invalid option"
 fi
 echo '---------------------------------------------------'
 }
@@ -380,7 +424,7 @@ then
     apt remove openssh-server
 elif [ $option = 'on' ]
 then
-    systemctl start ssh
+    systemctl start ssh &> /dev/null
     if [ $? = 0 ]
     then
         echo "SSH is activated"
@@ -408,6 +452,12 @@ echo '***************************************************'
 echo $'\t' "SYSTEM MANAGER (BETA)"
 echo '---------------------------------------------------'
 }
+
+if [[ $EUID -ne 0 ]]
+then
+   echo "This script must be run as root" 
+   exit 1
+fi
 
 while [ $GO = 1 ]
 do
