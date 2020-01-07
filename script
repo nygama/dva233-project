@@ -364,13 +364,8 @@ then
         
 elif [ $option = 'lm' ]
 then
-    stat $fname
-    read -p 'Change last modified attribute? (yes/no): ' YNanswer
-    if [ $YNanswer = 'yes' ] 
-    then
-        read -p 'New date and time (YYYYMMDDHHmm): ' date
-        touch -t $date $fname
-    fi
+    read -p 'New date and time (YYYYMMDDHHmm): ' date
+    touch -t $date $fname
 else 
     echo "Invalid option"
 fi
