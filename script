@@ -177,7 +177,7 @@ read -p 'groupname: ' gName
 grep "$gName" /etc/group &> /dev/null
 if [ $? -eq 1 ]
 then
-    echo "User not found"
+    echo "Group not found"
 else
     echo
     echo "the members of $gName are: "
@@ -204,7 +204,7 @@ else
     grep "$grpname" /etc/group &> /dev/null
     if [ $? -eq 1 ]
     then
-        echo "User not found"
+        echo "Group not found"
     else
     
         if [ $input = "add" ] 
@@ -227,16 +227,23 @@ echo '---------------------------------------------------'
 groupDel(){
 echo "whitch group do you want to delete?"
 read -p 'Name of group:' gName
-echo
-if [ $(cat /etc/group | egrep $gName | awk -F: '{print $3}') -gt 999 ]
+
+grep "$grpname" /etc/group &> /dev/null
+if [ $? -eq 1 ]
 then
-    groupdel $gName
-    if [ $? = 0 ]
-    then
-        echo 'Done'
-    fi
+    echo "Group not found"
 else
-    echo "you can't delete system groups!"
+    echo
+    if [ $(cat /etc/group | egrep $gName | awk -F: '{print $3}') -gt 999 ]
+    then
+        groupdel $gName
+        if [ $? = 0 ]
+        then
+            echo 'Done'
+        fi
+    else
+        echo "you can't delete system groups!"
+    fi
 fi
 echo '---------------------------------------------------'
 }
