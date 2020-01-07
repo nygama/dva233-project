@@ -325,56 +325,62 @@ echo '---------------------------------------------------'
 
 folderMod() {
 read -p 'Path of folder to modify: ' fname
-echo
-echo -e "\t--Options--"
-echo
-echo -e ${RED}rn${NC} $'\t' - Rename selected folder.
-echo -e ${RED}pr${NC} $'\t' - Change privilegies for folder.
-echo -e ${RED}st${NC} $'\t' - Change sticky bit.
-echo -e ${RED}sg${NC} $'\t' - Modify setgid.
-echo -e ${RED}lm${NC} $'\t' - Change last modified attribute.
-echo
-read -p 'Option: ' option
+ls $fname &> /dev/null
+if [ $? -eq 2 ]
+then
+        echo "Folder not found"
+else
+    echo
+    echo -e "\t--Options--"
+    echo
+    echo -e ${RED}rn${NC} $'\t' - Rename selected folder.
+    echo -e ${RED}pr${NC} $'\t' - Change privilegies for folder.
+    echo -e ${RED}st${NC} $'\t' - Change sticky bit.
+    echo -e ${RED}sg${NC} $'\t' - Modify setgid.
+    echo -e ${RED}lm${NC} $'\t' - Change last modified attribute.
+    echo
+    read -p 'Option: ' option
 
-if [ $option = 'rn' ]
-then
-    read -p 'New name: ' nfname
-    mv $fname "$fname/../$nfname"
-    
-elif [ $option = 'pr' ]
-then
-    read -p 'Set privilegies for user, group or others? (u/g/o): ' UGO
-    read -p 'What privlage do you want to change? Read, Write, Execute (r/w/x): ' RWX
-    read -p 'Do you want to add or remove this privilage? (+/-)' ADDRM
-    
-    chmod $UGO$ADDRM$RWX $fname
-    
-elif [ $option = 'st' ]
-then
-    read -p 'Have sticky bit? (yes/no): ' YNanswer
-    if [ $YNanswer = 'yes' ]
+    if [ $option = 'rn' ]
     then
-        chmod +t $fname
-    else
-        chmod -t $fname
-    fi
-    
-elif [ $option = 'sg' ]
-then
-    read -p 'Set setgid? (yes/no): ' YNanswer
-        if [ $YNanswer = 'yes' ] 
+        read -p 'New name: ' nfname
+        mv $fname "$fname/../$nfname"
+
+    elif [ $option = 'pr' ]
+    then
+        read -p 'Set privilegies for user, group or others? (u/g/o): ' UGO
+        read -p 'What privlage do you want to change? Read, Write, Execute (r/w/x): ' RWX
+        read -p 'Do you want to add or remove this privilage? (+/-)' ADDRM
+
+        chmod $UGO$ADDRM$RWX $fname
+
+    elif [ $option = 'st' ]
+    then
+        read -p 'Have sticky bit? (yes/no): ' YNanswer
+        if [ $YNanswer = 'yes' ]
         then
-            chmod g+s $fname
-        else 
-            chmod g-s $fname
+            chmod +t $fname
+        else
+            chmod -t $fname
         fi
-        
-elif [ $option = 'lm' ]
-then
-    read -p 'New date and time (YYYYMMDDHHmm): ' date
-    touch -t $date $fname
-else 
-    echo "Invalid option"
+
+    elif [ $option = 'sg' ]
+    then
+        read -p 'Set setgid? (yes/no): ' YNanswer
+            if [ $YNanswer = 'yes' ] 
+            then
+                chmod g+s $fname
+            else 
+                chmod g-s $fname
+            fi
+
+    elif [ $option = 'lm' ]
+    then
+        read -p 'New date and time (YYYYMMDDHHmm): ' date
+        touch -t $date $fname
+    else 
+        echo "Invalid option"
+    fi
 fi
 echo '---------------------------------------------------'
 }
