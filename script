@@ -325,14 +325,14 @@ echo '---------------------------------------------------'
 
 folderMod() {
 read -p 'Path of folder to modify: ' fname
-
+echo
 echo -e "\t--Options--"
 echo
-echo ${RED}rn${NC} $'\t' - Rename selected folder.
-echo ${RED}pr${NC} $'\t' - Change privilegies for folder.
-echo ${RED}st${NC} $'\t' - Change sticky bit.
-echo ${RED}sg${NC} $'\t' - Modify setgid.
-echo ${RED}lm${NC} $'\t' - Change last modified attribute.
+echo -e ${RED}rn${NC} $'\t' - Rename selected folder.
+echo -e ${RED}pr${NC} $'\t' - Change privilegies for folder.
+echo -e ${RED}st${NC} $'\t' - Change sticky bit.
+echo -e ${RED}sg${NC} $'\t' - Modify setgid.
+echo -e ${RED}lm${NC} $'\t' - Change last modified attribute.
 echo
 read -p 'Option: ' option
 
