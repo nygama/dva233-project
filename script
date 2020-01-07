@@ -440,6 +440,12 @@ echo $'\t' "SYSTEM MANAGER (BETA)"
 echo '---------------------------------------------------'
 }
 
+if [[ $EUID -ne 0 ]]
+then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
 while [ $GO = 1 ]
 do
     clear
